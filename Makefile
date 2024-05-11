@@ -6,7 +6,7 @@ CFILES = src/main.cpp
 make:
 	make build
 	make run
-build:
+build: 	
 	g++ -o $(OUTFILE) $(FLAGS) $(CFILES)
 run:
 	./$(OUTFILE)
