@@ -39,18 +39,18 @@ returns the spots the piece at pos1 can move to
 ```
 Join game
  |
-\\/
+ \/
 Fetch <--------------------------------------------------------------------------------------+
  | (assuming it is player's turn)                                                            |
-\\/                                                                                          |
+ \/                                                                                          |
 Player sends move  <-------------+    (Player can now see where piece can move)              | 
  |                             GetValidMoves                                                 | 
-\\/                              /\\                                                         |
+ \/                              /\                                                          |
 IsValidMove ----------------------+                                                          | 
  | (valid)      (invalid)                                                                    |
-\\/                                                                                          |
+ \/                                                                                          |
 Send Move                                                                                    |
  | (is valid)                                                                                |
-\\/                                                                                          |
+ \/                                                                                          |
 GetValidMoves -------------------------------------------------------------------------------+
 ```
