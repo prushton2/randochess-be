@@ -1,7 +1,7 @@
 # Randochess
 This is a fork of chess, which has random made up rules applied each game. This adds a bit of refreshing fun to chess, and helps bridge skill issues for the sake of fun.
 
-## Gameplay
+# Gameplay
 Rules will be able to modify traits of pieces. These traits include the following:
 
 * Valid movement spaces
@@ -12,9 +12,9 @@ Rules will be able to modify traits of pieces. These traits include the followin
 A rule can modify one of these traits (movement and capture spaces are considered one trait), and there will only be one rule per piece per trait. The goal of the rules is to add mystery to what rules are in play, not what each rule does.<br>
 For example, there would only be one rule that can modify pawn movement, and one rule that modifies pawn promotion.
 
-## Technical Info
+# Technical Info
 
-### Endpoints
+## Endpoints
 
 ### Init game
 Send back a join code to a game for the opponent, and a host code for the host
@@ -35,7 +35,7 @@ Since the movable spots can be undetermined, this move takes two spots and deter
 ### GetValidMoves
 returns the spots the piece at pos1 can move to
 
-### Info Loop
+## Info Loop
 ```
 Join game
  |
