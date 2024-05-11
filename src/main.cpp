@@ -1,8 +1,12 @@
+#include <iostream>
 #include "httplib.h"
+
+using namespace httplib;
 
 int main(void)
 {
-        using namespace httplib;
+
+
 
         Server svr;
 
