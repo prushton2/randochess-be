@@ -72,7 +72,7 @@ int main(void)
 
 		string board_state = "[";
 		for(int i = 0; i<64; i++)
-			board_state = board_state + std::to_string(gamecodes[req.matches[1]]->board[i/8][i%8]) + ",";
+			board_state = board_state + std::to_string(gamecodes[req.matches[1]]->board[i]) + ",";
 		board_state.pop_back();
 		board_state += "]";
 		
