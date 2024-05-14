@@ -1,9 +1,22 @@
+#include "rules.h"
+
+using std::map;
+
 struct Game {
-	// int format: n0000ppp
-	// n determines side (0 is white or empty, 1 is black)
-	// p determines piece (000 = empty, 001 = pawn, 010 = rook, 011 = knight, 100 = rook, 101 = queen, 110 = king)
-	uint8_t[64] board;
+public:
+	uint8_t board[8][8];
 	uint8_t turn; //0 for white, 1 for black
-	//some thing here for all piece rules idk
 	
-}
+	int last_accessed_at;
+
+	int load_rules();
+	int init_board();
+
+	int set_piece(char file, int rank, int piece);
+
+	int is_valid_move(int piece_pos, int end_pos);
+	int play(int start_pos, int end_pos);
+
+	uint8_t* get_board_state();
+};
+

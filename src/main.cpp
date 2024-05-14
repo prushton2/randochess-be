@@ -1,5 +1,6 @@
 #include <iostream>
 #include "httplib.h"
+#include "game.cpp"
 
 #include <string>
 #include <format>
@@ -16,7 +17,7 @@ using std::string;
 int main(void)
 {
 	// Definitions
-	std::map<std::string, int> gamecodes;
+	std::map<std::string, Game*> gamecodes;
 
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(0,99999);
@@ -32,17 +33,20 @@ int main(void)
 			string host_code = std::to_string(distribution(generator));
 			string guest_code = std::to_string(distribution(generator));
 			
+
 			while(gamecodes[host_code] != 0) {
 				host_code = std::to_string(distribution(generator));
 			}
-			gamecodes[host_code] = std::time(0);
 			while(gamecodes[guest_code] != 0) {
 				guest_code = std::to_string(distribution(generator));
 			}
-			gamecodes[guest_code] = std::time(0);
-		
-			cout << "Host: " << host_code << "[" << gamecodes[host_code] << "]" << endl;
-			cout << "Guest: " << guest_code << "[" << gamecodes[guest_code] << "]" << endl;
+			gamecodes[host_code] = new Game;
+			gamecodes[guest_code] = gamecodes[host_code];
+
+			gamecodes[host_code]->init_board();
+
+			cout << "Host: " << host_code << endl;
+			cout << "Guest: " << guest_code << endl;
 
 			res.set_content(
 				"{'host_code':"+host_code+",'guest_code':"+guest_code+"}", 
@@ -51,9 +55,7 @@ int main(void)
 
 	svr.Get(R"(/game/info/([0-9][0-9]*))", [&](const Request &req, Response &res) {
                 string code = req.matches[1];
-		int creation_date = gamecodes[code];
-		res.set_content(std::to_string(creation_date), "text/plain");
-		gamecodes[code] = std::time(0);
+		res.set_content("HAHA!", "text/plain");
 	});
 
 	//Join game
@@ -64,7 +66,18 @@ int main(void)
 	//Receives: Is valid move
 	
 	//Fetch Move
-	//Was there another move played by the opponent (server keeps track of if the move was propogated or not)
+	svr.Get(R"(/game/fetch/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+		cout << req.matches[1] << endl;
+		cout << gamecodes[req.matches[1]]->board << endl;
+
+		string board_state = "[";
+		for(int i = 0; i<64; i++)
+			board_state = board_state + std::to_string(gamecodes[req.matches[1]]->board[i/8][i%8]) + ",";
+		board_state.pop_back();
+		board_state += "]";
+		
+		res.set_content(board_state, "text/plain");
+	});
 
 	//IsValidMove
 	//Since the movable spots can be undetermined, this move takes two spots and determines if the piece at p1 can move to p2
