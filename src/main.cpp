@@ -94,7 +94,13 @@ int main(void)
 	});
 	svr.Post(R"(/game/move/([0-9][0-9]*))", [&](const Request &req, Response &res) {
 		set_headers(&res);
-		
+		Game* pGame = gamecodes[req.matches[1]];
+		if(pGame == NULL) {
+			res.set_content("{\"status\": \"Invalid\"}", "application/json");
+			return;
+		}
+
+
 		string temp = "";
 		int start = 0;
 		int end = 0;
@@ -114,13 +120,20 @@ int main(void)
 			return;
 		}
 
-		if(!gamecodes[req.matches[1]]->is_valid_turn(req.matches[1], start)) {
+		if(!pGame->is_valid_turn(req.matches[1], start)) {
 			res.set_content("{\"status\": \"Invalid\"}", "application/json");
 			return;
 		}
 
-		if(!gamecodes[req.matches[1]]->is_valid_move(start, end)) {
+		if(!pGame->is_valid_move(start, end)) {
 			cout << "Bad Move" << endl;
+			res.set_content("{\"status\": \"Invalid\"}", "application/json");
+			return;
+		}
+
+		int piece = gamecodes[req.matches[1]]->board[start];
+		if(pGame->rules[piece&0b00001111].requires_los && !pGame->check_line_of_sight(start, end)) {
+			cout << "No LOS" << endl;
 			res.set_content("{\"status\": \"Invalid\"}", "application/json");
 			return;
 		}

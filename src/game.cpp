@@ -1,5 +1,6 @@
 #include "rules.cpp"
 #include <map>
+#include <cstdlib>
 #include <algorithm>
 #include <string>
 
@@ -36,6 +37,10 @@ public:
 		initialize_rules();
 		rules[1] = pawn_rules;
 		rules[2] = rook_rules;
+		rules[3] = knight_rules;
+		rules[4] = bishop_rules;
+		rules[5] = queen_rules;
+		rules[6] = king_rules;
 
 		return 0;
 	}
@@ -120,6 +125,28 @@ public:
 		cout << compareTo << " " << leftCompare << " " << rightCompare << endl;
 
 		return 0;
+	}
+
+	int check_line_of_sight(int piece, int end) {
+		cout << "Running LOS check" << endl;
+		int dir = (end-piece)/(abs(end-piece));
+		int delta_x = end%8 - piece%8; //do note x and y are backwards and i do not plan on fixing it
+		int delta_y = (int)(end/8) - (int)(piece/8);
+		int n = std::max(abs(delta_x), abs(delta_y));
+		int sum = 0;
+	//	cout << "dir: " << dir << endl;
+	//	cout << "d_x: " << delta_x << endl;
+	//	cout << "d_y: " << delta_y << endl;
+	//	cout << "n:   " << n << endl;
+
+		for(int i = 1; i<n; i++) {
+			int index = i * ( (dir * (delta_y==0) ) + (dir * (delta_x==0) * 8) );
+			index += piece;
+			sum += board[index];
+		//	cout << i << ": index: " << index << ", sum: " << sum << ", addend: " << (int)board[index] << endl;
+		}
+		return sum == 0;
+
 	}
 };
 
