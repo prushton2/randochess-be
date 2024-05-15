@@ -19,7 +19,7 @@ void set_headers(Response* res) {
 	res->set_header("Access-Control-Allow-Credentials", "true");
 	res->set_header("Access-Control-Allow-Methods", "OPTIONS, GET, POST, HEAD");
 	res->set_header("Allow", "GET, POST, HEAD, OPTIONS");
-	res->set_header("Access-Control-Allow-Headers", "*"); //X-Requested-With, Content-Type, Accept, Origin, Authorization");
+	res->set_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Accept, Origin, Authorization");
 }
 
 int main(void)
@@ -39,7 +39,7 @@ int main(void)
 
 	svr.Get("/game/new", [&](const Request &req, Response &res) {
 		//create 2 codes, one for host to play and one for guest to play
-		cout << distribution(generator) << " was generated" << endl;
+		distribution(generator);
 		string host_code = std::to_string(distribution(generator));
 		string guest_code = std::to_string(distribution(generator));
 		
@@ -53,11 +53,8 @@ int main(void)
 		gamecodes[host_code] = new Game;
 		gamecodes[guest_code] = gamecodes[host_code];
 
-		gamecodes[host_code]->init_board();
+		gamecodes[host_code]->init_board(host_code, guest_code);
 
-		cout << "Host: " << host_code << endl;
-		cout << "Guest: " << guest_code << endl;
-		
 		set_headers(&res);
 
 		res.set_content(
@@ -80,22 +77,60 @@ int main(void)
 	
 	//Fetch Move
 	svr.Get(R"(/game/fetch/([0-9][0-9]*))", [&](const Request &req, Response &res) {
-		cout << req.matches[1] << endl;
-		cout << gamecodes[req.matches[1]]->board << endl;
-
 		string board_state = "[";
 		for(int i = 0; i<64; i++)
 			board_state = board_state + std::to_string(gamecodes[req.matches[1]]->board[i]) + ",";
 		board_state.pop_back();
 		board_state += "]";
 		
-		res.set_content(board_state, "text/plain");
+		set_headers(&res);
+		res.set_content("{\"board\":"+board_state+"}", "application/json");
 	});
 
 	//Send Move
+	svr.Options(R"(/game/move/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+		set_headers(&res);
+		res.set_content("", "text/plain");
+	});
 	svr.Post(R"(/game/move/([0-9][0-9]*))", [&](const Request &req, Response &res) {
-		cout << req.body << endl;
-		res.set_content(req.body, "text/plain");
+		set_headers(&res);
+		
+		string temp = "";
+		int start = 0;
+		int end = 0;
+
+		for(int i = 0; i<req.body.size(); i++) {
+			if(req.body.at(i) == '\n') {
+				start = atoi(temp.c_str());
+				temp = "";
+			} else {
+				temp += req.body.at(i);
+			}
+		}
+		end = atoi(temp.c_str());
+		
+		if(start < 0 || start > 63 || end < 0 || end > 63) {
+			res.set_content("{\"status\": \"Invalid\"}", "application/json");
+			return;
+		}
+
+		if(!gamecodes[req.matches[1]]->is_valid_turn(req.matches[1], start)) {
+			res.set_content("{\"status\": \"Invalid\"}", "application/json");
+			return;
+		}
+
+		if(!gamecodes[req.matches[1]]->is_valid_move(start, end)) {
+			cout << "Bad Move" << endl;
+			res.set_content("{\"status\": \"Invalid\"}", "application/json");
+			return;
+		}
+			
+
+		gamecodes[req.matches[1]]->board[end] = gamecodes[req.matches[1]]->board[start];
+		gamecodes[req.matches[1]]->board[start] = 0b00000000;
+		gamecodes[req.matches[1]]->board[end] |= 0b00100000;
+		
+		res.set_content("{\"status\": \"Success\"}", "text/plain");
 	});
 
 	//GetValidMoves
