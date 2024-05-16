@@ -18,6 +18,8 @@ public:
 	uint8_t board[64];
 	uint8_t turn; //0 for white, 1 for black
 	
+	string lobby_owner;
+
 	string white_code;
 	string black_code;
 
@@ -31,6 +33,8 @@ public:
 		for(int i = 0; i<64; i++) {
 			board[i] = init_board[i];
 		}
+		lobby_owner = white_side;
+
 		white_code = white_side;
 		black_code = black_side;
 
@@ -122,28 +126,38 @@ public:
 			}
 		}
 		
-		cout << compareTo << " " << leftCompare << " " << rightCompare << endl;
+//		cout << compareTo << " " << leftCompare << " " << rightCompare << endl;
 
 		return 0;
 	}
 
 	int check_line_of_sight(int piece, int end) {
 		cout << "Running LOS check" << endl;
-		int dir = (end-piece)/(abs(end-piece));
+	//	int dir = (end-piece)/(abs(end-piece));
 		int delta_x = end%8 - piece%8; //do note x and y are backwards and i do not plan on fixing it
 		int delta_y = (int)(end/8) - (int)(piece/8);
+		int dir_1 = 1;
+		int dir_2 = -(end%8 - piece%8) / abs(end%8-piece%8) ;
 		int n = std::max(abs(delta_x), abs(delta_y));
+		int v = (delta_x==0)*(8-1)+1; //this is the vertical or horizontal distance to travel
 		int sum = 0;
-	//	cout << "dir: " << dir << endl;
-	//	cout << "d_x: " << delta_x << endl;
-	//	cout << "d_y: " << delta_y << endl;
-	//	cout << "n:   " << n << endl;
+		cout << "dr1: " << dir_1 << endl;
+		cout << "dr2: " << dir_2 << endl;
+		cout << "d_x: " << delta_x << endl;
+		cout << "d_y: " << delta_y << endl;
+		cout << "n:   " << n << endl;
 
 		for(int i = 1; i<n; i++) {
-			int index = i * ( (dir * (delta_y==0) ) + (dir * (delta_x==0) * 8) );
+			int index = dir_1 * (
+				(i * v) * (delta_x == 0 || delta_y == 0) +
+				(i*8+i*dir_2) * (delta_x != 0 && delta_y != 0)
+			);
 			index += piece;
 			sum += board[index];
-		//	cout << i << ": index: " << index << ", sum: " << sum << ", addend: " << (int)board[index] << endl;
+			cout <<i<<": "<< (delta_x == 0||delta_y == 0) << " : " << (delta_x != 0 && delta_y != 0) << endl;
+			cout <<i<<": "<< (i * v) << " : " << (i*8+dir_2) << endl;
+			cout <<i<<": piece: "<< piece << ", index: " << index << endl;;
+			cout <<i<<": sum: "  << sum << ", addend: " << (int)board[index] << endl;
 		}
 		return sum == 0;
 

@@ -34,8 +34,6 @@ int main(void)
         Server svr;
 	//Init game
 	//Send back a join code to a game for the opponent, and a host code for the host
-	
-
 
 	svr.Get("/game/new", [&](const Request &req, Response &res) {
 		//create 2 codes, one for host to play and one for guest to play
@@ -77,13 +75,19 @@ int main(void)
 	
 	//Fetch Move
 	svr.Get(R"(/game/fetch/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+		set_headers(&res);
+		Game* pGame = gamecodes[req.matches[1]];
+		if(pGame == NULL) {
+			res.set_content("{\"status\": \"Invalid\"}", "application/json");
+			return;
+		}
+
 		string board_state = "[";
 		for(int i = 0; i<64; i++)
 			board_state = board_state + std::to_string(gamecodes[req.matches[1]]->board[i]) + ",";
 		board_state.pop_back();
 		board_state += "]";
 		
-		set_headers(&res);
 		res.set_content("{\"board\":"+board_state+"}", "application/json");
 	});
 
@@ -145,14 +149,35 @@ int main(void)
 		
 		res.set_content("{\"status\": \"Success\"}", "text/plain");
 	});
+	
+	svr.Get(R"(/game/leave/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+		set_headers(&res);
+		Game* pGame = gamecodes[req.matches[1]];
+		if(pGame == NULL) {
+			res.set_content("{\"status\": \"Invalid\"}", "application/json");
+			return;
+		}
+		
+		if(pGame->lobby_owner != req.matches[1]) {
+			res.set_content("{\"status\": \"Invalid\"}", "application/json");
+			return;
+		}
 
-	//GetValidMoves
-	//returns the spots the piece at pos1 can move to
+		string code1 = pGame->white_code;
+		string code2 = pGame->black_code;
+
+		delete gamecodes[code1];
+		gamecodes[code1] = NULL;
+		gamecodes[code2] = NULL;
+		res.set_content("{\"status\": \"Success\"}", "application/json");
+		return;
+	});
+	
 
 
-
-        svr.Get("/stop", [&](const Request &req, Response &res)
-                { svr.stop(); });
+        svr.Get("/stop", [&](const Request &req, Response &res) { 
+		svr.stop(); 
+	});
 
         svr.listen("localhost", 6000);
 }
