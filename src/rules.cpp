@@ -25,8 +25,9 @@ void initialize_rules() {
 	pawn_rules.first_move_rule = true;
 	pawn_rules.move[0] = "+2+0";
 	pawn_rules.move[1] = "+1+0";
-	pawn_rules.take[0] = "+1+1";
-	pawn_rules.take[1] = "+1-1";
+	pawn_rules.take[0] = "+0+0"; //we cant have a rule 0 since that would only work on first move
+	pawn_rules.take[1] = "+1+1"; 
+	pawn_rules.take[2] = "+1-1";
 
 	rook_rules.requires_los = true;
 	rook_rules.move[0] = "+i+0";

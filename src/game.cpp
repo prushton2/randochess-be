@@ -19,9 +19,11 @@ public:
 	uint8_t turn; //0 for white, 1 for black
 	
 	string lobby_owner;
-
+	string current_turn;
 	string white_code;
 	string black_code;
+	
+	string winner;
 
 	Rule rules[8];
 
@@ -34,6 +36,7 @@ public:
 			board[i] = init_board[i];
 		}
 		lobby_owner = white_side;
+		current_turn = "white";
 
 		white_code = white_side;
 		black_code = black_side;
@@ -45,7 +48,8 @@ public:
 		rules[4] = bishop_rules;
 		rules[5] = queen_rules;
 		rules[6] = king_rules;
-
+		
+		winner = "";
 		return 0;
 	}
 
@@ -61,11 +65,12 @@ public:
 	}
 	
 	int is_valid_turn(string code, int piece_pos) {
-		return 1;
-		if(code == white_code && ((board[piece_pos] >> 7) & 1) == 0) {
+		if(code == white_code && current_turn == "white" && ((board[piece_pos] >> 7) & 1) == 0) {
+			current_turn = "black";
 			return 1;
 		}
-		if(code == black_code && ((board[piece_pos] >> 7) & 1) == 1) {
+		if(code == black_code && current_turn == "black" && ((board[piece_pos] >> 7) & 1) == 1) {
+			current_turn = "white";
 			return 1;
 		}
 		return 0;
@@ -73,12 +78,13 @@ public:
 
 	int is_valid_move(int piece_pos, int end_pos) {
 		string* active_ruleset;
+		if((board[end_pos] & (1 << 7)) == (board[piece_pos] & (1<<7)) && ((board[end_pos]&0b00001111) != 0)) {
+			return 0;
+		}
 		if(board[end_pos] == 0b0) {
 			active_ruleset = ( (rules[board[piece_pos] & 0b00001111]).move );
 		} 
 		else {
-			if(board[end_pos] >> 7 == board[piece_pos] >> 7)
-				return 0;
 			active_ruleset = ( (rules[board[piece_pos] & 0b00001111]).take );
 		}
 		
@@ -132,35 +138,61 @@ public:
 	}
 
 	int check_line_of_sight(int piece, int end) {
-		cout << "Running LOS check" << endl;
-	//	int dir = (end-piece)/(abs(end-piece));
+		int piece_div = piece/8; //so they are integers
+		int end_div = end/8;
 		int delta_x = end%8 - piece%8; //do note x and y are backwards and i do not plan on fixing it
 		int delta_y = (int)(end/8) - (int)(piece/8);
-		int dir_1 = 1;
-		int dir_2 = -(end%8 - piece%8) / abs(end%8-piece%8) ;
+		int dir_1 = -std::clamp(end_div - piece_div, -1, 1);
+		int dir_2 = -(end%8 - piece%8) / (abs(end%8-piece%8) == 0 ? 1 : abs(end%8-piece%8)) ;
+
+		dir_1 += dir_1 == 0;
+		dir_2 += dir_2 == 0;
+
 		int n = std::max(abs(delta_x), abs(delta_y));
 		int v = (delta_x==0)*(8-1)+1; //this is the vertical or horizontal distance to travel
 		int sum = 0;
-		cout << "dr1: " << dir_1 << endl;
-		cout << "dr2: " << dir_2 << endl;
-		cout << "d_x: " << delta_x << endl;
-		cout << "d_y: " << delta_y << endl;
-		cout << "n:   " << n << endl;
+	//	cout << "dr1: " << dir_1 << endl;
+	//	cout << "dr2: " << dir_2 << endl;
+	//	cout << "d_x: " << delta_x << endl;
+	//	cout << "d_y: " << delta_y << endl;
+	//	cout << "n:   " << n << endl;
+	//	cout << "v:   " << v << endl;
 
 		for(int i = 1; i<n; i++) {
-			int index = dir_1 * (
-				(i * v) * (delta_x == 0 || delta_y == 0) +
-				(i*8+i*dir_2) * (delta_x != 0 && delta_y != 0)
+			int index = (
+				(dir_1 * i * -v * dir_2) * (delta_x == 0 || delta_y == 0) +
+				(-dir_1 * i * 8 + (-dir_2*i)) * (delta_x != 0 && delta_y != 0)
 			);
+			// top half handles cardinal movements ( + ). It multiplies the iterator by a number that is either 1 or 8 depending on 
+
+			//cout <<i<<": "<<(delta_x == 0||delta_y == 0) << " : "<< (delta_x != 0 && delta_y != 0) <<endl;
+			//cout <<i<<": "<<(delcout <<i<<":("<< (i*-v*dir_2)<<" : "<<(i*8+i*-dir_2)<<") * "<<dir_1<<endl;
+			//cout <<i<<": "<<(delcout <<i<<": piece: "<< piece<< " + index: " << index;
+			
 			index += piece;
+			//cout <<" = " << index << endl;
 			sum += board[index];
-			cout <<i<<": "<< (delta_x == 0||delta_y == 0) << " : " << (delta_x != 0 && delta_y != 0) << endl;
-			cout <<i<<": "<< (i * v) << " : " << (i*8+dir_2) << endl;
-			cout <<i<<": piece: "<< piece << ", index: " << index << endl;;
-			cout <<i<<": sum: "  << sum << ", addend: " << (int)board[index] << endl;
+			
+			//cout <<i<<": sum: "  << sum << ", addend: " << (int)board[index] << endl;
 		}
 		return sum == 0;
 
+	}
+
+	int check_for_wins() {
+		int black_king = 0;
+		int white_king = 0;
+		for(int i = 0; i<64; i++) {
+			if( (board[i] & 1<<7) == 1 && (board[i] & 0b00001111) == 0b110)
+				white_king = 1;
+			else if( (board[i] & 1<<7) == 0 && (board[i] & 0b00001111) == 0b110)
+				black_king = 1;
+		}
+		if(white_king == 0)
+			winner = "black";
+		if(black_king == 0)
+			winner = "white";
+		return black_king != white_king;
 	}
 };
 

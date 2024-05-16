@@ -63,7 +63,7 @@ int main(void)
 	svr.Get(R"(/game/info/([0-9][0-9]*))", [&](const Request &req, Response &res) {
                 string code = req.matches[1];
 		set_headers(&res);
-		res.set_content("HAHA!", "text/plain");
+		res.set_content("", "text/plain");
 	});
 
 	//Join game
@@ -88,7 +88,7 @@ int main(void)
 		board_state.pop_back();
 		board_state += "]";
 		
-		res.set_content("{\"board\":"+board_state+"}", "application/json");
+		res.set_content("{\"board\":"+board_state+", \"winner\": \""+pGame->winner+"\", \"white_side\": \""+pGame->white_code+"\", \"black_side\": \""+pGame->black_code+"\"}", "application/json");
 	});
 
 	//Send Move
@@ -130,23 +130,27 @@ int main(void)
 		}
 
 		if(!pGame->is_valid_move(start, end)) {
-			cout << "Bad Move" << endl;
+			//cout << "Bad Move" << endl;
 			res.set_content("{\"status\": \"Invalid\"}", "application/json");
 			return;
 		}
 
 		int piece = gamecodes[req.matches[1]]->board[start];
 		if(pGame->rules[piece&0b00001111].requires_los && !pGame->check_line_of_sight(start, end)) {
-			cout << "No LOS" << endl;
+			//cout << "No LOS" << endl;
 			res.set_content("{\"status\": \"Invalid\"}", "application/json");
 			return;
 		}
-			
+		
+		int checkForWins = (pGame->board[end] & 0b00001111) == 6;
 
 		gamecodes[req.matches[1]]->board[end] = gamecodes[req.matches[1]]->board[start];
 		gamecodes[req.matches[1]]->board[start] = 0b00000000;
 		gamecodes[req.matches[1]]->board[end] |= 0b00100000;
 		
+		if(checkForWins) 
+			pGame->check_for_wins();
+
 		res.set_content("{\"status\": \"Success\"}", "text/plain");
 	});
 	
@@ -157,7 +161,7 @@ int main(void)
 			res.set_content("{\"status\": \"Invalid\"}", "application/json");
 			return;
 		}
-		
+
 		if(pGame->lobby_owner != req.matches[1]) {
 			res.set_content("{\"status\": \"Invalid\"}", "application/json");
 			return;
