@@ -16,7 +16,7 @@ using std::string;
 // p determines piece (000 = empty, 001 = pawn, 010 = rook, 011 = knight, 100 = bishop, 101 = queen, 110 = king)
 // m means if the piece has moved or not
 
-int Game::init_board(string white_side, string black_side, RuleGroup* AllRules) {
+int Game::init_board(string white_side, string black_side, RuleGroup* AllRules, int rule_id) {
 	uint8_t init_board[64] = {130,131,132,133,134,132,131,130,129,129,129,129,129,129,129,129,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,2,3,4,5,6,4,3,2};
 	//last_accessed_at = std::time(0);
 	for(int i = 0; i<64; i++) {
@@ -24,16 +24,47 @@ int Game::init_board(string white_side, string black_side, RuleGroup* AllRules) 
 	}
 	lobby_owner = white_side;
 	current_turn = "white";
+	rule = AllRules[rule_id].name;
 
 	white_code = white_side;
 	black_code = black_side;
 	
-	rules[1] = AllRules[0].pawn   ;
-	rules[2] = AllRules[0].rook   ;
-	rules[3] = AllRules[0].knight ;
-	rules[4] = AllRules[0].bishop ;
-	rules[5] = AllRules[0].queen  ;
-	rules[6] = AllRules[0].king   ;
+	Rule* default_rules[6] = {AllRules[0].pawn, AllRules[0].rook, AllRules[0].knight, AllRules[0].bishop, AllRules[0].queen, AllRules[0].king};
+	//cout << rule_id << endl;
+	//rule_id = 2;
+	Rule* applied_rules[6] = {AllRules[rule_id].pawn, AllRules[rule_id].rook, AllRules[rule_id].knight, AllRules[rule_id].bishop, AllRules[rule_id].queen, AllRules[rule_id].king};
+
+	rules[1] = new PRule;
+	rules[2] = new PRule;
+	rules[3] = new PRule;
+	rules[4] = new PRule;
+	rules[5] = new PRule;
+	rules[6] = new PRule;
+
+	for(int i = 1; i<7; i++) {
+		//cout << i << ": " << endl;
+		if(applied_rules[i-1]->move != NULL) {
+		//	cout << "move: apl " << endl;
+			rules[i]->move = applied_rules[i-1]->move;
+			rules[i]->requires_los = applied_rules[i-1]->requires_los;
+			rules[i]->first_move_rule = applied_rules[i-1]->first_move_rule;
+		} else {
+		//	cout << "move: def " << endl;
+			rules[i]->move = default_rules[i-1]->move;
+			rules[i]->requires_los = default_rules[i-1]->requires_los;
+			rules[i]->first_move_rule = default_rules[i-1]->first_move_rule;
+		}
+
+		if(applied_rules[i-1]->take != NULL) {
+		//	cout << "take: apl " << endl;
+			rules[i]->take =    applied_rules[i-1]->take;
+		} else {
+		//	cout << "take: def " << endl;
+			rules[i]->take =    default_rules[i-1]->take;
+		}
+	}
+
+
 	
 	winner = "";
 	return 0;

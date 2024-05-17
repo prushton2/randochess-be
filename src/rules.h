@@ -14,7 +14,16 @@ struct Rule {
 	string take[32];
 };
 
+
+struct PRule { //rule but it uses pointers
+	bool requires_los;
+	bool first_move_rule;
+	string* move;
+	string* take;
+};
+
 struct RuleGroup {
+	string name;
 	Rule* pawn;
 	Rule* rook;
 	Rule* knight;

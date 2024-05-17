@@ -33,30 +33,32 @@ int main(void)
 	cout << "init rule data" << endl;
 	initialize_rules(allGroups);
 	cout << "init rng engine" << endl;
-	std::default_random_engine generator;
-	std::uniform_int_distribution<int> distribution(0,99999);
+	typedef std::mt19937 MyRNG;  // the Mersenne Twister with a popular choice of parameters
+	MyRNG rng;                   // e.g. keep one global instance (per thread)
+	rng.seed(time(0));
+	std::uniform_int_distribution<uint32_t> code_gen(0,99999); // range [0,10]
+	std::uniform_int_distribution<uint32_t> rule_gen(1,2); // range [0,10]
 
+	cout << "init svr" << endl;
         Server svr;
 	//Init game
 	//Send back a join code to a game for the opponent, and a host code for the host
 
 	svr.Get("/game/new", [&](const Request &req, Response &res) {
 		//create 2 codes, one for host to play and one for guest to play
-		distribution(generator);
-		string host_code = std::to_string(distribution(generator));
-		string guest_code = std::to_string(distribution(generator));
-		
+		string host_code  = std::to_string(code_gen(rng));
+		string guest_code = std::to_string(code_gen(rng));
 
 		while(gamecodes[host_code] != 0) {
-			host_code = std::to_string(distribution(generator));
+			host_code = std::to_string(code_gen(rng));
 		}
 		while(gamecodes[guest_code] != 0) {
-			guest_code = std::to_string(distribution(generator));
+			guest_code = std::to_string(code_gen(rng));
 		}
 		gamecodes[host_code] = new Game;
 		gamecodes[guest_code] = gamecodes[host_code];
 
-		gamecodes[host_code]->init_board(host_code, guest_code, allGroups);
+		gamecodes[host_code]->init_board(host_code, guest_code, allGroups, rule_gen(rng));
 
 		set_headers(&res);
 
@@ -93,7 +95,7 @@ int main(void)
 		board_state.pop_back();
 		board_state += "]";
 		
-		res.set_content("{\"status\": \"Success\", \"board\":"+board_state+", \"winner\": \""+pGame->winner+"\", \"white_side\": \""+pGame->white_code+"\", \"black_side\": \""+pGame->black_code+"\", \"turn\": \""+pGame->current_turn+"\"}", "application/json");
+		res.set_content("{\"status\": \"Success\", \"rule\": \""+pGame->rule+"\", \"board\":"+board_state+", \"winner\": \""+pGame->winner+"\", \"white_side\": \""+pGame->white_code+"\", \"black_side\": \""+pGame->black_code+"\", \"turn\": \""+pGame->current_turn+"\"}", "application/json");
 	});
 
 	//Send Move
@@ -190,7 +192,7 @@ int main(void)
 
 
         svr.Get("/stop", [&](const Request &req, Response &res) {
-		for(int i = 0; i<1; i++) {
+		for(int i = 0; i<3; i++) {
 			cout << "Deleting ruleset " << i << ".." << endl;
 			if(allGroups[i].pawn != 0)
 				delete allGroups[i].pawn;
