@@ -136,4 +136,19 @@ void initialize_rules(RuleGroup* AllRules ) {
 	AllRules[2].pawn->take[0] = "/0/0"; //we cant have a rule 0 since that would only work on first move
 	AllRules[2].pawn->take[1] = "+1+1"; 
 	AllRules[2].pawn->take[2] = "+1-1";
+
+	AllRules[2].rook->move[0] = "NULL";
+	AllRules[2].rook->take[0] = "NULL";
+
+	AllRules[2].knight->move[0] = "NULL";
+	AllRules[2].knight->take[0] = "NULL";
+	
+	AllRules[2].bishop->move[0] = "NULL";
+	AllRules[2].bishop->take[0] = "NULL";
+	
+	AllRules[2].queen->move[0] = "NULL";
+	AllRules[2].queen->take[0] = "NULL";
+	
+	AllRules[2].king->move[0] =  "NULL";
+	AllRules[2].king->take[0] =  "NULL";
 }

@@ -30,8 +30,7 @@ int Game::init_board(string white_side, string black_side, RuleGroup* AllRules, 
 	black_code = black_side;
 	
 	Rule* default_rules[6] = {AllRules[0].pawn, AllRules[0].rook, AllRules[0].knight, AllRules[0].bishop, AllRules[0].queen, AllRules[0].king};
-	//cout << rule_id << endl;
-	//rule_id = 2;
+
 	Rule* applied_rules[6] = {AllRules[rule_id].pawn, AllRules[rule_id].rook, AllRules[rule_id].knight, AllRules[rule_id].bishop, AllRules[rule_id].queen, AllRules[rule_id].king};
 
 	rules[1] = new PRule;
@@ -43,29 +42,29 @@ int Game::init_board(string white_side, string black_side, RuleGroup* AllRules, 
 
 	for(int i = 1; i<7; i++) {
 		//cout << i << ": " << endl;
-		if(applied_rules[i-1]->move != NULL) {
-		//	cout << "move: apl " << endl;
+		//cout << "Move: " << applied_rules[i-1]->move[0] << endl;
+		if(applied_rules[i-1]->move[0] != "NULL") {
+			//cout << "move: apl " << endl;
 			rules[i]->move = applied_rules[i-1]->move;
 			rules[i]->requires_los = applied_rules[i-1]->requires_los;
 			rules[i]->first_move_rule = applied_rules[i-1]->first_move_rule;
 		} else {
-		//	cout << "move: def " << endl;
+			//cout << "move: def " << endl;
 			rules[i]->move = default_rules[i-1]->move;
 			rules[i]->requires_los = default_rules[i-1]->requires_los;
 			rules[i]->first_move_rule = default_rules[i-1]->first_move_rule;
 		}
 
-		if(applied_rules[i-1]->take != NULL) {
-		//	cout << "take: apl " << endl;
+		//cout << "Take: " << applied_rules[i-1]->take[0] << endl;
+		if(applied_rules[i-1]->take[0] != "NULL") {
+			//cout << "take: apl " << endl;
 			rules[i]->take =    applied_rules[i-1]->take;
 		} else {
-		//	cout << "take: def " << endl;
+			//cout << "take: def " << endl;
 			rules[i]->take =    default_rules[i-1]->take;
 		}
 	}
 
-
-	
 	winner = "";
 	return 0;
 }
