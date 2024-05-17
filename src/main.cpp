@@ -1,6 +1,7 @@
 #include <iostream>
 #include "httplib.h"
-#include "game.cpp"
+#include "game.h"
+#include "rules.h"
 
 #include <string>
 #include <format>
@@ -25,12 +26,16 @@ void set_headers(Response* res) {
 int main(void)
 {
 	// Definitions
+	cout << "init game id map" << endl;
 	std::map<std::string, Game*> gamecodes;
-
+	cout << "init groups array" << endl;
+	RuleGroup allGroups[32];
+	cout << "init rule data" << endl;
+	initialize_rules(allGroups);
+	cout << "init rng engine" << endl;
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(0,99999);
 
-	
         Server svr;
 	//Init game
 	//Send back a join code to a game for the opponent, and a host code for the host
@@ -51,7 +56,7 @@ int main(void)
 		gamecodes[host_code] = new Game;
 		gamecodes[guest_code] = gamecodes[host_code];
 
-		gamecodes[host_code]->init_board(host_code, guest_code);
+		gamecodes[host_code]->init_board(host_code, guest_code, allGroups);
 
 		set_headers(&res);
 
@@ -88,7 +93,7 @@ int main(void)
 		board_state.pop_back();
 		board_state += "]";
 		
-		res.set_content("{\"board\":"+board_state+", \"winner\": \""+pGame->winner+"\", \"white_side\": \""+pGame->white_code+"\", \"black_side\": \""+pGame->black_code+"\"}", "application/json");
+		res.set_content("{\"status\": \"Success\", \"board\":"+board_state+", \"winner\": \""+pGame->winner+"\", \"white_side\": \""+pGame->white_code+"\", \"black_side\": \""+pGame->black_code+"\", \"turn\": \""+pGame->current_turn+"\"}", "application/json");
 	});
 
 	//Send Move
@@ -136,7 +141,7 @@ int main(void)
 		}
 
 		int piece = gamecodes[req.matches[1]]->board[start];
-		if(pGame->rules[piece&0b00001111].requires_los && !pGame->check_line_of_sight(start, end)) {
+		if(pGame->rules[piece&0b00001111]->requires_los && !pGame->check_line_of_sight(start, end)) {
 			//cout << "No LOS" << endl;
 			res.set_content("{\"status\": \"Invalid\"}", "application/json");
 			return;
@@ -179,7 +184,22 @@ int main(void)
 	
 
 
-        svr.Get("/stop", [&](const Request &req, Response &res) { 
+        svr.Get("/stop", [&](const Request &req, Response &res) {
+		for(int i = 0; i<1; i++) {
+			cout << "Deleting ruleset " << i << ".." << endl;
+			if(allGroups[i].pawn != 0)
+				delete allGroups[i].pawn;
+			if(allGroups[i].rook != 0)
+				delete allGroups[i].rook;
+			if(allGroups[i].knight != 0)
+				delete allGroups[i].knight;
+			if(allGroups[i].bishop != 0)
+				delete allGroups[i].bishop;
+			if(allGroups[i].queen != 0)
+				delete allGroups[i].queen;
+			if(allGroups[i].king != 0)
+				delete allGroups[i].king;
+		}
 		svr.stop(); 
 	});
 

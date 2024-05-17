@@ -1,7 +1,7 @@
 CC = g++
 FLAGS = -g
 OUTFILE = main.o
-CFILES = src/main.cpp
+CFILES = src/main.cpp src/rules.cpp src/game.cpp
 
 make:
 	make build
