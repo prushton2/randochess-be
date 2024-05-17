@@ -44,7 +44,7 @@ int main(void)
 	//Init game
 	//Send back a join code to a game for the opponent, and a host code for the host
 
-	svr.Get("/game/new", [&](const Request &req, Response &res) {
+	svr.Get("/randochess/game/new", [&](const Request &req, Response &res) {
 		//create 2 codes, one for host to play and one for guest to play
 		string host_code  = std::to_string(code_gen(rng));
 		string guest_code = std::to_string(code_gen(rng));
@@ -67,7 +67,7 @@ int main(void)
 		"application/json");
 	});
 
-	svr.Get(R"(/game/info/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+	svr.Get(R"(/randochess/game/info/([0-9][0-9]*))", [&](const Request &req, Response &res) {
                 string code = req.matches[1];
 		set_headers(&res);
 		res.set_content("", "text/plain");
@@ -75,13 +75,13 @@ int main(void)
 
 	//Join game
 	//Check if join code is valid	
-	svr.Get(R"(/game/exists/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+	svr.Get(R"(/randochess/game/exists/([0-9][0-9]*))", [&](const Request &req, Response &res) {
 		set_headers(&res);
 		res.set_content( std::to_string(gamecodes[req.matches[1]] != NULL), "text/plain");
 	});
 	
 	//Fetch Move
-	svr.Get(R"(/game/fetch/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+	svr.Get(R"(/randochess/game/fetch/([0-9][0-9]*))", [&](const Request &req, Response &res) {
 		set_headers(&res);
 		Game* pGame = gamecodes[req.matches[1]];
 		if(pGame == NULL) {
@@ -99,11 +99,11 @@ int main(void)
 	});
 
 	//Send Move
-	svr.Options(R"(/game/move/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+	svr.Options(R"(/randochess/game/move/([0-9][0-9]*))", [&](const Request &req, Response &res) {
 		set_headers(&res);
 		res.set_content("", "text/plain");
 	});
-	svr.Post(R"(/game/move/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+	svr.Post(R"(/randochess/game/move/([0-9][0-9]*))", [&](const Request &req, Response &res) {
 		set_headers(&res);
 		Game* pGame = gamecodes[req.matches[1]];
 		if(pGame == NULL) {
@@ -166,7 +166,7 @@ int main(void)
 		res.set_content("{\"status\": \"Success\"}", "text/plain");
 	});
 	
-	svr.Get(R"(/game/leave/([0-9][0-9]*))", [&](const Request &req, Response &res) {
+	svr.Get(R"(/randochess/game/leave/([0-9][0-9]*))", [&](const Request &req, Response &res) {
 		set_headers(&res);
 		Game* pGame = gamecodes[req.matches[1]];
 		if(pGame == NULL) {
@@ -191,7 +191,7 @@ int main(void)
 	
 
 
-        svr.Get("/stop", [&](const Request &req, Response &res) {
+        svr.Get("/randochess/stop", [&](const Request &req, Response &res) {
 		for(int i = 0; i<3; i++) {
 			cout << "Deleting ruleset " << i << ".." << endl;
 			if(allGroups[i].pawn != 0)
