@@ -153,6 +153,11 @@ int main(void)
 		gamecodes[req.matches[1]]->board[start] = 0b00000000;
 		gamecodes[req.matches[1]]->board[end] |= 0b00100000;
 		
+		if(pGame->current_turn == "white")
+			pGame->current_turn = "black";
+		else
+			pGame->current_turn = "white";
+
 		if(checkForWins) 
 			pGame->check_for_wins();
 

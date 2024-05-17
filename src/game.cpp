@@ -52,11 +52,9 @@ int Game::set_piece(char file, int rank, int piece) {
 	
 int Game::is_valid_turn(string code, int piece_pos) {
 	if(code == white_code && current_turn == "white" && ((board[piece_pos] >> 7) & 1) == 0) {
-		current_turn = "black";
 		return 1;
 	}
 	if(code == black_code && current_turn == "black" && ((board[piece_pos] >> 7) & 1) == 1) {
-		current_turn = "white";
 		return 1;
 	}
 	return 0;
