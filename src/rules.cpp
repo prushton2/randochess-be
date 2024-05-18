@@ -151,4 +151,45 @@ void initialize_rules(RuleGroup* AllRules ) {
 	
 	AllRules[2].king->move[0] =  "NULL";
 	AllRules[2].king->take[0] =  "NULL";
+
+	
+	//Have a plan to kill everyone you meet
+	AllRules[3].name = "Have a plan to kill everyone you meet";
+	AllRules[3].pawn = new Rule;
+	AllRules[3].rook = new Rule;
+	AllRules[3].knight = new Rule;
+	AllRules[3].bishop = new Rule;
+	AllRules[3].queen = new Rule;
+	AllRules[3].king = new Rule;
+
+	AllRules[3].pawn->move[0] = "NULL";
+	AllRules[3].pawn->take[0] = "NULL";
+	
+	AllRules[3].rook->move[0] = "NULL";
+	AllRules[3].rook->take[0] = "NULL";
+
+	AllRules[3].knight->move[0] = "NULL";
+	AllRules[3].knight->take[0] = "NULL";
+	
+	AllRules[3].bishop->first_move_rule = false;
+	AllRules[3].bishop->requires_los = false;
+	AllRules[3].bishop->move[0] = "+1+1";
+	AllRules[3].bishop->move[1] = "+0+1";
+	AllRules[3].bishop->move[2] = "-1+1";
+	AllRules[3].bishop->move[3] = "-1+0";
+	AllRules[3].bishop->move[4] = "-1-1";
+	AllRules[3].bishop->move[5] = "+0-1";
+	AllRules[3].bishop->move[6] = "+1-1";
+	AllRules[3].bishop->move[7] = "+1+0";
+	
+	AllRules[3].bishop->take[0] = "+i-i";
+	AllRules[3].bishop->take[1] = "+i+i";
+	AllRules[3].bishop->take[2] = "-i-i";
+	AllRules[3].bishop->take[3] = "-i+i";
+	
+	AllRules[3].queen->move[0] = "NULL";
+	AllRules[3].queen->take[0] = "NULL";
+	
+	AllRules[3].king->move[0] =  "NULL";
+	AllRules[3].king->take[0] =  "NULL";
 }

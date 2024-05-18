@@ -128,6 +128,7 @@ int Game::is_valid_move(int piece_pos, int end_pos) {
 	rightCompare[3] = 'i';
 
 	//:vomit emoji:
+	
 	for(int i = 0; i<32; i++) {
 		if(active_ruleset[i] == compareTo || 
 		   active_ruleset[i] == rightCompare || 
