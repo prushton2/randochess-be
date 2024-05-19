@@ -192,4 +192,75 @@ void initialize_rules(RuleGroup* AllRules ) {
 	
 	AllRules[3].king->move[0] =  "NULL";
 	AllRules[3].king->take[0] =  "NULL";
+
+
+	AllRules[4].name = "Knook";
+	AllRules[4].pawn = new Rule;
+	AllRules[4].rook = new Rule;
+	AllRules[4].knight = new Rule;
+	AllRules[4].bishop = new Rule;
+	AllRules[4].queen = new Rule;
+	AllRules[4].king = new Rule;
+
+	AllRules[4].pawn->move[0] = "NULL";
+	AllRules[4].pawn->take[0] = "NULL";
+	
+	AllRules[4].rook->first_move_rule = false;
+	AllRules[4].rook->requires_los = true;
+	
+	AllRules[4].rook->move[0] = "+i+0";
+	AllRules[4].rook->move[1] = "-i+0";
+	AllRules[4].rook->move[2] = "+0+i";
+	AllRules[4].rook->move[3] = "+0-i";
+
+	AllRules[4].rook->move[4] = "+2+1";
+	AllRules[4].rook->move[5] = "+2-1";
+	AllRules[4].rook->move[6] = "-2+1";
+	AllRules[4].rook->move[7] = "-2-1";
+	AllRules[4].rook->move[8] = "+1+2";
+	AllRules[4].rook->move[9] = "+1-2";
+	AllRules[4].rook->move[10] = "-1+2";
+	AllRules[4].rook->move[11] = "-1-2";
+
+	copy(AllRules[4].rook->move, AllRules[4].rook->move+12, AllRules[4].rook->take);
+
+	AllRules[4].knight->move[0] = "NULL";
+	AllRules[4].knight->take[0] = "NULL";
+	
+	AllRules[4].bishop->move[0] = "NULL";
+	AllRules[4].bishop->take[0] = "NULL";
+	
+	AllRules[4].queen->move[0] = "NULL";
+	AllRules[4].queen->take[0] = "NULL";
+	
+	AllRules[4].king->move[0] =  "NULL";
+	AllRules[4].king->take[0] =  "NULL";
 }
+
+/*
+	AllRules[z].name = "Name";
+	AllRules[z].pawn = new Rule;
+	AllRules[z].rook = new Rule;
+	AllRules[z].knight = new Rule;
+	AllRules[z].bishop = new Rule;
+	AllRules[z].queen = new Rule;
+	AllRules[z].king = new Rule;
+
+	AllRules[z].pawn->move[0] = "NULL";
+	AllRules[z].pawn->take[0] = "NULL";
+	
+	AllRules[z].rook->move[0] = "NULL";
+	AllRules[z].rook->take[0] = "NULL";
+
+	AllRules[z].knight->move[0] = "NULL";
+	AllRules[z].knight->take[0] = "NULL";
+	
+	AllRules[z].bishop->move[0] = "NULL";
+	AllRules[z].bishop->take[0] = "NULL";
+	
+	AllRules[z].queen->move[0] = "NULL";
+	AllRules[z].queen->take[0] = "NULL";
+	
+	AllRules[z].king->move[0] =  "NULL";
+	AllRules[z].king->take[0] =  "NULL";
+	*/

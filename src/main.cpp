@@ -37,7 +37,7 @@ int main(void)
 	MyRNG rng;                   // e.g. keep one global instance (per thread)
 	rng.seed(time(0));
 	std::uniform_int_distribution<uint32_t> code_gen(0,99999); // range [0,10]
-	std::uniform_int_distribution<uint32_t> rule_gen(1,3); // range [0,10]
+	std::uniform_int_distribution<uint32_t> rule_gen(1,4); // range [0,10]
 
 	cout << "init svr" << endl;
         Server svr;
@@ -192,7 +192,7 @@ int main(void)
 
 
         svr.Get("/randochess/stop", [&](const Request &req, Response &res) {
-		for(int i = 0; i<4; i++) {
+		for(int i = 0; i<5; i++) {
 			cout << "Deleting ruleset " << i << ".." << endl;
 			if(allGroups[i].pawn != 0)
 				delete allGroups[i].pawn;

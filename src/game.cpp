@@ -25,7 +25,7 @@ int Game::init_board(string white_side, string black_side, RuleGroup* AllRules, 
 	lobby_owner = white_side;
 	current_turn = "white";
 	rule = AllRules[rule_id].name;
-
+	
 	white_code = white_side;
 	black_code = black_side;
 	
@@ -153,10 +153,16 @@ int Game::is_valid_move(int piece_pos, int end_pos) {
 }
 
 int Game::check_line_of_sight(int piece, int end) {
-	int piece_div = piece/8; //so they are integers
-	int end_div = end/8;
 	int delta_x = end%8 - piece%8; //do note x and y are backwards and i do not plan on fixing it
 	int delta_y = (int)(end/8) - (int)(piece/8);
+	
+	if(delta_x != 0 && delta_y != 0)
+		if(abs(delta_x) != abs(delta_y))
+			return 1;
+		
+
+	int end_div = end/8;
+	int piece_div = piece/8; //so they are integers
 	int dir_1 = -std::clamp(end_div - piece_div, -1, 1);
 	int dir_2 = -(end%8 - piece%8) / (abs(end%8-piece%8) == 0 ? 1 : abs(end%8-piece%8)) ;
 
