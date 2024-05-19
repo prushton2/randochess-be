@@ -1,7 +1,24 @@
 # Randochess
 This is a fork of chess, which has random made up rules applied each game. This adds a bit of refreshing fun to chess, and helps bridge skill issues for the sake of fun.
 
-# Gameplay
+# Rules
+
+## OOPS! All Knights
+All pieces have the same movement as a knight
+
+## PREPARE THYSELF
+Pawns can move 4 spaces forward on their first move.
+note: they still cannot take on this move
+
+## Have a plan to kill everyone you meet
+Bishops now move like a king. When they take a piece, they can do so diagonally and without line of sight.
+note: they cannot take a piece cardinally, even if it is next to them
+
+## Knook
+Rooks can now move like a knight if they wish.
+note: knights are unchanged
+
+# Gameplay Information
 Rules will be able to modify traits of pieces. These traits include the following:
 
 * Valid movement spaces
