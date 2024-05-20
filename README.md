@@ -49,9 +49,6 @@ Was there another move played by the opponent (server keeps track of if the move
 ### IsValidMove
 Since the movable spots can be undetermined, this move takes two spots and determines if the piece at p1 can move to p2
 
-### GetValidMoves
-returns the spots the piece at pos1 can move to
-
 ## Info Loop
 ```
 Join game
